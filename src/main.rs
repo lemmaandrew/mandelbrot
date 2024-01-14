@@ -23,7 +23,7 @@ impl ColorInterpolator {
 
         let t = t.clamp(0.0, 1.0);
         let n = self.colors.len() as f64 - 1.0;
-        let x = t * n as f64;
+        let x = t * n;
         let i = x.floor();
         let j = x.ceil();
         if i == j {
@@ -65,8 +65,7 @@ impl MandelbrotSet {
             let znorm = z.norm();
             if znorm > self.escape_radius {
                 if smooth {
-                    let e = 1.0f64.exp();
-                    return i as f64 + 1.0 - znorm.log(e).log(e) / 2.0f64.log(e);
+                    return i as f64 + 1.0 - znorm.ln().ln() / 2.0f64.ln();
                 }
             }
         }
