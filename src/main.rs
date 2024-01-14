@@ -62,10 +62,10 @@ impl MandelbrotSet {
         let mut z = Complex::new(0.0, 0.0);
         for i in 0..self.max_iterations {
             z = z * z + c;
-            let znorm = z.norm();
-            if znorm > self.escape_radius {
+            let znorm2 = z.re * z.re + z.im + z.im;
+            if znorm2 > self.escape_radius * self.escape_radius {
                 if smooth {
-                    return i as f64 + 1.0 - znorm.ln().ln() / 2.0f64.ln();
+                    return i as f64 + 1.0 - znorm2.sqrt().ln().ln() / 2.0f64.ln();
                 }
             }
         }
