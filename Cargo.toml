@@ -9,6 +9,7 @@ edition = "2021"
 clap = { version = "4.4.14", features = ["derive"] }
 image = "0.24.7"
 num = "0.4.1"
+rust_decimal_macros = "1.33.1"
 
 [profile.dev]
 opt-level = 3
