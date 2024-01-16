@@ -165,17 +165,19 @@ fn main() {
         Complex::new(args.center_real, args.center_imag),
         args.viewport_width,
     );
-    let mut pixels = vec![vec![Rgb([0, 0, 0]); args.image_width]; args.image_height];
+    let mut pixels: Vec<Vec<Rgb<u8>>> = Vec::new();
     for row in 0..args.image_height {
-        pixels[row] = (0..args.image_width)
-            .into_par_iter()
-            .map(|col| {
-                let c = viewport.pixel_loc(row, col);
-                let instability = 1.0 - mandelbrot_set.stability(c, true);
-                let color = color_interpolator.color_at(instability);
-                color
-            })
-            .collect();
+        pixels.push(
+            (0..args.image_width)
+                .into_par_iter()
+                .map(|col| {
+                    let c = viewport.pixel_loc(row, col);
+                    let instability = 1.0 - mandelbrot_set.stability(c, true);
+                    let color = color_interpolator.color_at(instability);
+                    color
+                })
+                .collect(),
+        );
     }
     let mut image = RgbImage::new(args.image_width as u32, args.image_height as u32);
     for row in 0..args.image_height {
