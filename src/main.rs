@@ -3,6 +3,7 @@
 use clap::Parser;
 use image::{Rgb, RgbImage};
 use num::complex::Complex;
+use rayon::prelude::*;
 
 #[derive(Debug)]
 struct ColorInterpolator {
@@ -43,7 +44,7 @@ impl ColorInterpolator {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug)]
 struct MandelbrotSet {
     max_iterations: u32,
     escape_radius: f64,
@@ -164,13 +165,22 @@ fn main() {
         Complex::new(args.center_real, args.center_imag),
         args.viewport_width,
     );
+    let mut pixels = vec![vec![Rgb([0, 0, 0]); args.image_width]; args.image_height];
+    for row in 0..args.image_height {
+        pixels[row] = (0..args.image_width)
+            .into_par_iter()
+            .map(|col| {
+                let c = viewport.pixel_loc(row, col);
+                let instability = 1.0 - mandelbrot_set.stability(c, true);
+                let color = color_interpolator.color_at(instability);
+                color
+            })
+            .collect();
+    }
     let mut image = RgbImage::new(args.image_width as u32, args.image_height as u32);
     for row in 0..args.image_height {
         for col in 0..args.image_width {
-            let c = viewport.pixel_loc(row, col);
-            let instability = 1.0 - mandelbrot_set.stability(c, true);
-            let color = color_interpolator.color_at(instability);
-            image.put_pixel(col as u32, row as u32, color);
+            image.put_pixel(col as u32, row as u32, pixels[row][col]);
         }
     }
     let _ = image.save(args.output);
