@@ -83,37 +83,24 @@ impl MandelbrotSet {
 
 #[derive(Debug)]
 struct Viewport {
-    image_width: usize,
-    image_height: usize,
-    center: Complex<f64>,
-    view_width: f64,
+    scale: f64,
+    offset: Complex<f64>,
 }
 
 impl Viewport {
     fn new(image_width: usize, image_height: usize, center: Complex<f64>, view_width: f64) -> Self {
+        let scale = view_width / image_width as f64;
+        let view_height = scale * image_height as f64;
+        let offset = center + Complex::new(-view_width, view_height) / 2.0;
         Self {
-            image_width,
-            image_height,
-            center,
-            view_width,
+            scale,
+            offset
         }
-    }
-
-    fn scale(&self) -> f64 {
-        self.view_width / self.image_width as f64
-    }
-
-    fn view_height(&self) -> f64 {
-        self.scale() * self.image_height as f64
-    }
-
-    fn offset(&self) -> Complex<f64> {
-        self.center + Complex::new(-self.view_width, self.view_height()) / 2.0
     }
 
     /// Given a pixel in the image plane, return the coordinates in the complex plane
     fn pixel_loc(&self, row: usize, col: usize) -> Complex<f64> {
-        Complex::new(col as f64, -(row as f64)) * self.scale() + self.offset()
+        Complex::new(col as f64, -(row as f64)) * self.scale + self.offset
     }
 }
 
