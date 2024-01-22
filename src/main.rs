@@ -67,6 +67,8 @@ impl MandelbrotSet {
             if znorm2 > self.escape_radius * self.escape_radius {
                 if smooth {
                     return i as f64 + 1.0 - znorm2.sqrt().ln().log(2.0);
+                } else {
+                    return i as f64;
                 }
             }
         }
